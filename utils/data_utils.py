@@ -3,6 +3,42 @@ import h5py
 import numpy as np
 import torch
 from torch.utils.data import Dataset
+import zipfile
+from urllib.request import urlretrieve
+
+def download_modelnet40(data_dir):
+    """
+    Downloads and extracts the ModelNet40 dataset to the specified directory.
+
+    Args:
+        data_dir (str): Directory to download and extract the dataset.
+
+    Returns:
+        str: Path to the extracted dataset directory.
+    """
+    os.makedirs(data_dir, exist_ok=True)
+    url = "https://shapenet.cs.stanford.edu/media/modelnet40_ply_hdf5_2048.zip"
+    zip_path = os.path.join(data_dir, "modelnet40_ply_hdf5_2048.zip")
+    extract_dir = os.path.join(data_dir, "modelnet40_ply_hdf5_2048")
+
+    # Check if dataset is already extracted
+    if os.path.exists(os.path.join(extract_dir, "train_files.txt")):
+        # print("ModelNet40 dataset already downloaded and extracted.")
+        return extract_dir
+
+    # Download the zip file if not present
+    if not os.path.exists(zip_path):
+        print("Downloading ModelNet40 dataset...")
+        urlretrieve(url, zip_path)
+        print("Download completed.")
+
+    # Extract the dataset
+    print("Extracting dataset...")
+    with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+        zip_ref.extractall(data_dir)
+    print("Extraction completed.")
+
+    return extract_dir
 
 
 def random_rotate_point_cloud(pc, angle_range=(-np.pi/20, np.pi/20), axis='z'):
@@ -126,16 +162,18 @@ class ModelNet40Dataset(Dataset):
         self.use_translate = use_translate
         self.num_points = num_points
 
+        extract_dir = download_modelnet40(data_dir)
+
         # Load the list of files for training or testing
         if split == 'train':
-            file_list = os.path.join(data_dir, 'train_files.txt')
+            file_list = os.path.join(extract_dir, 'train_files.txt')
         else:
-            file_list = os.path.join(data_dir, 'test_files.txt')
+            file_list = os.path.join(extract_dir, 'test_files.txt')
 
         self.file_paths = []
         with open(file_list, 'r') as f:
             for line in f:
-                self.file_paths.append(os.path.join(self.data_dir,
+                self.file_paths.append(os.path.join(extract_dir,
                                                     os.path.basename(line.strip())))
 
         self.points = []

@@ -185,8 +185,8 @@ def main():
                     help='The type of model to train: gcn, gat, gin, dgcnn, pointnet, or pointnet2')
 
     # Dataset directory argument
-    parser.add_argument('--data_dir', type=str, default='data/modelnet40_ply_hdf5_2048',
-                        help='The directory containing the dataset files (e.g., train_files.txt)')
+    parser.add_argument('--data_dir', type=str, default='data',
+                        help='The directory containing the dataset files')
 
     # Number of points to sample from the point cloud
     parser.add_argument('--num_points', type=int, default=1024,
