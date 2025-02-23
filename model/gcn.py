@@ -105,7 +105,6 @@ class SAGPoolLayer(nn.Module):
     1) Use a hidden GCN layer to compute score features for nodes.
     2) Optionally apply batch normalization and activation.
     3) Project the features to a final score, which can be used for topK or soft gating.
-    4) After pooling, the adjacency matrix is re-normalized.
     
     Args:
         in_channels: The number of input features for each node.
